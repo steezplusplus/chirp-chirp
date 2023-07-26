@@ -1,6 +1,9 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Head from "next/head";
-import { RouterOutputs, api } from "~/utils/api";
+import { type RouterOutputs, api } from "~/utils/api";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime"
+dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const { user } = useUser();
@@ -25,9 +28,15 @@ const PostView = (props: PostWithUser) => {
   return (
     <div className="flex items-center w-full gap-x-3 border-b border-slate-400 p-8" key={post.id}>
       <img src={author.profileImageUrl} alt="profile image" className="w-14 h-14 rounded-full" />
-      <div className="flex flex-col">
-        <p className="text-sm text-slate-300">{`@${author.username}`}</p>
-        <p>{post.content}</p>
+      <div className="flex flex-col text-slate-300">
+        <div className="flex items-center gap-x-1 text-xs">
+          <p>{`@${author.username}`}</p>
+          {` · `}
+          <p className="font-thin">{dayjs(post.createdAt).fromNow()}</p>
+        </div>
+        <div>
+          <p>{post.content}</p>
+        </div>
       </div>
     </div>
   );
