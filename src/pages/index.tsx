@@ -1,14 +1,24 @@
+import { useState } from 'react';
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Head from "next/head";
 import Image from "next/image";
 import { type RouterOutputs, api } from "~/utils/api";
+import { LoadingPageOverlay } from "~/components/LoadingSpinner";
 import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime"
-import { LoadingPageOverlay } from "~/components/loadingSpinner";
+import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
+  const [input, setInput] = useState<string>('');
   const { user } = useUser();
+  const ctx = api.useContext();
+
+  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+      void ctx.posts.getAll.invalidate();
+    }
+  });
 
   console.log(user);
 
@@ -25,7 +35,14 @@ const CreatePostWizard = () => {
         width={56}
         height={56}
       />
-      <input placeholder="Make a post..." className="grow bg-transparent outline-none pl-2" />
+      <input
+        placeholder="Make a post..."
+        className="grow bg-transparent outline-none pl-2"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        disabled={isPosting}
+      />
+      <button onClick={() => mutate({ content: input })}>Submit</button>
     </div>
   )
 }
@@ -69,7 +86,7 @@ const Feed = () => {
 
   return (
     <div className="flex flex-col">
-      {data?.map((fullPost) => {
+      {data.map((fullPost) => {
         return <PostView {...fullPost} key={fullPost.post.id} />
       })}
     </div>
