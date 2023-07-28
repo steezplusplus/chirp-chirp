@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import { type RouterOutputs, api } from "~/utils/api";
 import { LoadingPageOverlay, LoadingSpinner } from "~/components/LoadingSpinner";
 import toast from 'react-hot-toast';
@@ -82,13 +83,18 @@ const PostView = (props: PostWithUser) => {
       />
       <div className="flex flex-col text-slate-300">
         <div className="flex items-center gap-x-1 text-xs">
-          <p>{`@${author.username}`}</p>
+          <Link
+            href={`/@${author.username}`}
+            className="hover:underline"
+          >
+            {`@${author.username}`}
+          </Link>
           {` · `}
           <p className="font-thin">{dayjs(post.createdAt).fromNow()}</p>
         </div>
-        <div>
+        <Link href={`/post/${post.id}`}>
           <p>{post.content}</p>
-        </div>
+        </Link>
       </div>
     </div>
   );
