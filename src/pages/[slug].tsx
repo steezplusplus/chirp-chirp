@@ -13,7 +13,7 @@ export default function Profile(props: ProfileProps) {
   const { data } = api.profile.getUserByUsername.useQuery({ username })
 
   if (!data) {
-    return <p>Profile not found!</p>  // TODO Should redirect?
+    return <p>Profile not found!</p>  // TODO Should redirect to 404 page
   }
 
   console.log(data);
@@ -21,7 +21,7 @@ export default function Profile(props: ProfileProps) {
   return (
     <>
       <Head>
-        <title>{`ChirpChirp | @${username}`}</title>
+        <title>{`ChirpChirp | @${data.username}`}</title>
       </Head>
       <main className="h-screen flex justify-center">
         <div className="w-full h-full border-x border-slate-400 md:max-w-2xl p-2">
