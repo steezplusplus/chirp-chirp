@@ -1,3 +1,4 @@
+// TODO Change color to slate, allow sizes to be changed via props
 export const LoadingSpinner = () => {
   return (
     <div role="status">
