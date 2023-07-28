@@ -7,6 +7,7 @@ import { LoadingPageOverlay, LoadingSpinner } from "~/components/LoadingSpinner"
 import toast from 'react-hot-toast';
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { RootLayout } from '~/components/RootLayout';
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
@@ -127,18 +128,17 @@ export default function Home() {
     return <div></div>;
   }
 
+  // TODO Dont show CreatePostWizard when not logged in
   return (
-    <main className="h-screen flex justify-center">
-      <div className="w-full h-full border-x border-slate-400 md:max-w-2xl p-2">
-        <div className="flex items-center border-b border-slate-400 p-4">
-          <CreatePostWizard />
-          <span className="ml-auto">
-            {!isSignedIn && <SignInButton />}
-            {!!isSignedIn && <SignOutButton />}
-          </span>
-        </div>
-        <Feed />
+    <RootLayout>
+      <div className="flex items-center border-b border-slate-400 p-4">
+        <CreatePostWizard />
+        <span className="ml-auto">
+          {!isSignedIn && <SignInButton />}
+          {!!isSignedIn && <SignOutButton />}
+        </span>
       </div>
-    </main>
+      <Feed />
+    </RootLayout>
   );
 }

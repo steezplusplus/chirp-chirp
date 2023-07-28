@@ -6,6 +6,7 @@ import superjson from "superjson";
 import { api } from "~/utils/api";
 import Image from "next/image"
 import Head from "next/head";
+import { RootLayout } from "~/components/RootLayout";
 
 type ProfileProps = InferGetStaticPropsType<typeof getStaticProps>;
 export default function Profile(props: ProfileProps) {
@@ -23,19 +24,17 @@ export default function Profile(props: ProfileProps) {
       <Head>
         <title>{`ChirpChirp | @${data.username}`}</title>
       </Head>
-      <main className="h-screen flex justify-center">
-        <div className="w-full h-full border-x border-slate-400 md:max-w-2xl p-2">
-          <div className="flex flex-col items-center">
-            <Image
-              src={data.profileImageUrl}
-              alt={`${data.username}'s Profile picutre`}
-              width={56}
-              height={56}
-            />
-            <p className="text-xs font-light">{`@${data.username}`}</p>
-          </div>
+      <RootLayout>
+        <div className="flex flex-col items-center">
+          <Image
+            src={data.profileImageUrl}
+            alt={`${data.username}'s Profile picutre`}
+            width={56}
+            height={56}
+          />
+          <p className="text-xs font-light">{`@${data.username}`}</p>
         </div>
-      </main>
+      </RootLayout >
     </>
   );
 };
