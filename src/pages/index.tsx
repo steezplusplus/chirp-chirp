@@ -10,7 +10,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
-  const [input, setInput] = useState<string>('');
+  const [input, setInput] = useState<string>(''); // TODO Bad re-render on every key-press
   const { user } = useUser();
   const ctx = api.useContext();
 
