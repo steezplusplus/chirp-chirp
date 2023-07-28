@@ -3,7 +3,8 @@ import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Head from "next/head";
 import Image from "next/image";
 import { type RouterOutputs, api } from "~/utils/api";
-import { LoadingPageOverlay } from "~/components/LoadingSpinner";
+import { LoadingPageOverlay, LoadingSpinner } from "~/components/LoadingSpinner";
+import toast from 'react-hot-toast';
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
@@ -17,13 +18,23 @@ const CreatePostWizard = () => {
     onSuccess: () => {
       setInput("");
       void ctx.posts.getAll.invalidate();
-    }
+      toast.success("Success!")
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage) {
+        toast.error(errorMessage.join("\n"));
+      } else {
+        toast.error("Failed to post! Please try again later.");
+      }
+    },
   });
 
   if (!user) {
     return null;
   }
 
+  // TODO a11y issue: should not disable button elements
   return (
     <div className="flex w-full gap-x-3">
       <Image
@@ -38,9 +49,21 @@ const CreatePostWizard = () => {
         className="grow bg-transparent outline-none pl-2"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            mutate({ content: input });
+          }
+        }}
         disabled={isPosting}
       />
-      <button onClick={() => mutate({ content: input })}>Submit</button>
+      {input.length > 0 &&
+        <button
+          onClick={() => mutate({ content: input })}
+          disabled={isPosting}
+        >
+          {isPosting ? <LoadingSpinner /> : 'Submit'}
+        </button>}
     </div>
   )
 }
