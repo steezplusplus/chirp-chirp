@@ -1,14 +1,11 @@
 import Image from "next/image"
 import Head from "next/head";
 import type { GetStaticPropsContext, InferGetStaticPropsType } from 'next';
-import { prisma } from "~/server/db";
-import { appRouter } from "~/server/api/root";
 import { api } from "~/utils/api";
 import { RootLayout } from "~/components/RootLayout";
 import { LoadingPageOverlay } from "~/components/LoadingSpinner";
 import { PostView } from "~/components/PostView";
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import superjson from "superjson";
+import { generateSSGHelper } from "~/server/helpers/generateSSGHelper";
 
 function ProfileFeed(props: { userId: string }) {
   const { userId } = props
@@ -66,11 +63,7 @@ export default function Profile(props: ProfileProps) {
 };
 
 export async function getStaticProps(context: GetStaticPropsContext<{ slug: string }>) {
-  const helpers = createServerSideHelpers({
-    router: appRouter,
-    ctx: { prisma, userId: null },
-    transformer: superjson,
-  });
+  const helpers = generateSSGHelper()
 
   const slug = context.params?.slug;
 
