@@ -11,7 +11,7 @@ import { RootLayout } from "~/components/RootLayout";
 type ProfileProps = InferGetStaticPropsType<typeof getStaticProps>;
 export default function Profile(props: ProfileProps) {
   const { username } = props;
-  const { data } = api.profile.getUserByUsername.useQuery({ username })
+  const { data } = api.profile.getUserByUsername.useQuery({ username }); // TODO `data.username` should not be nullable
 
   if (!data) {
     return <p>Profile not found!</p>  // TODO Should redirect to 404 page
@@ -28,7 +28,7 @@ export default function Profile(props: ProfileProps) {
         <div className="flex flex-col items-center">
           <Image
             src={data.profileImageUrl}
-            alt={`${data.username}'s Profile picutre`}
+            alt={`${data.username}'s profile picture`}
             width={56}
             height={56}
           />
