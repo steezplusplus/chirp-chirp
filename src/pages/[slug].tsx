@@ -7,18 +7,12 @@ import { api } from "~/utils/api";
 import { RootLayout } from "~/components/RootLayout";
 import { LoadingPageOverlay } from "~/components/LoadingSpinner";
 import { PostView } from "~/components/PostView";
-import superjson from "superjson";
 import { createServerSideHelpers } from "@trpc/react-query/server";
+import superjson from "superjson";
 
 function ProfileFeed(props: { userId: string }) {
   const { userId } = props
   const { data, isLoading: postsLoading } = api.posts.getPostsByUserId.useQuery({ userId });
-
-  const tempAuthor = {
-    "id": "user_2T1gDdWuKjUxRCWWZZTxHXjBMhx",
-    "username": "steezplusplus",
-    "profileImageUrl": "https://images.clerk.dev/oauth_github/img_2T1gDtQhco5XsO2QsQBe0QJVO0D.jpeg"
-  }; // TODO Get author in getPostsByUserId()
 
   if (postsLoading) {
     return (
@@ -34,13 +28,12 @@ function ProfileFeed(props: { userId: string }) {
 
   return (
     <div className="flex flex-col">
-      {data.map((post) => {
-        return <PostView post={post} key={post.id} author={tempAuthor} />
+      {data.map((fullPost) => {
+        return <PostView {...fullPost} key={fullPost.post.id} />
       })}
     </div>
   );
 }
-
 
 type ProfileProps = InferGetStaticPropsType<typeof getStaticProps>;
 export default function Profile(props: ProfileProps) {
