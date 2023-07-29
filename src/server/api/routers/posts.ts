@@ -20,6 +20,22 @@ export const postsRouter = createTRPCRouter({
     });
     return addClerkDataToPost(posts);
   }),
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.prisma.post.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+        });
+      }
+
+      return (await addClerkDataToPost([post]))[0];
+    }),
+  // TODO Does not need to be named `getPosts` since its already in `postsRouter`. Refactor to `getPostsBy...`
   getPostsByUserId: publicProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ ctx, input }) => {
