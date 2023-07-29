@@ -1,46 +1,78 @@
-import { createServerSideHelpers } from "@trpc/react-query/server";
+import Image from "next/image"
+import Head from "next/head";
 import type { GetStaticPropsContext, InferGetStaticPropsType } from 'next';
 import { prisma } from "~/server/db";
 import { appRouter } from "~/server/api/root";
-import superjson from "superjson";
 import { api } from "~/utils/api";
-import Image from "next/image"
-import Head from "next/head";
 import { RootLayout } from "~/components/RootLayout";
+import { LoadingPageOverlay } from "~/components/LoadingSpinner";
+import { PostView } from "~/components/PostView";
+import superjson from "superjson";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+
+function ProfileFeed(props: { userId: string }) {
+  const { userId } = props
+  const { data, isLoading: postsLoading } = api.posts.getPostsByUserId.useQuery({ userId });
+
+  const tempAuthor = {
+    "id": "user_2T1gDdWuKjUxRCWWZZTxHXjBMhx",
+    "username": "steezplusplus",
+    "profileImageUrl": "https://images.clerk.dev/oauth_github/img_2T1gDtQhco5XsO2QsQBe0QJVO0D.jpeg"
+  }; // TODO Get author in getPostsByUserId()
+
+  if (postsLoading) {
+    return (
+      <LoadingPageOverlay />
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <p>This user has not made any posts yet.</p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col">
+      {data.map((post) => {
+        return <PostView post={post} key={post.id} author={tempAuthor} />
+      })}
+    </div>
+  );
+}
+
 
 type ProfileProps = InferGetStaticPropsType<typeof getStaticProps>;
 export default function Profile(props: ProfileProps) {
   const { username } = props;
-  const { data } = api.profile.getUserByUsername.useQuery({ username }); // TODO `data.username` should not be nullable
+  const { data: userData } = api.profile.getUserByUsername.useQuery({ username }); // TODO `data.username` should not be nullable
 
-  if (!data) {
+  if (!userData) {
     return <p>Profile not found!</p>  // TODO Should redirect to 404 page
   }
-
-  console.log(data);
 
   return (
     <>
       <Head>
-        <title>{`ChirpChirp | @${data.username}`}</title>
+        <title>{`ChirpChirp | @${userData.username}`}</title>
       </Head>
       <RootLayout>
         <div className="flex flex-col items-center">
           <Image
-            src={data.profileImageUrl}
-            alt={`${data.username}'s profile picture`}
+            src={userData.profileImageUrl}
+            alt={`${userData.username}'s profile picture`}
             width={56}
             height={56}
           />
-          <p className="text-xs font-light">{`@${data.username}`}</p>
+          <p className="text-xs font-light">{`@${userData.username}`}</p>
         </div>
+        <ProfileFeed userId={userData.id} />
       </RootLayout >
     </>
   );
 };
 
 export async function getStaticProps(context: GetStaticPropsContext<{ slug: string }>) {
-
   const helpers = createServerSideHelpers({
     router: appRouter,
     ctx: { prisma, userId: null },
@@ -54,7 +86,6 @@ export async function getStaticProps(context: GetStaticPropsContext<{ slug: stri
   }
 
   const username = slug.replace('@', '');
-
   await helpers.profile.getUserByUsername.prefetch({ username });
 
   return {
